@@ -10,6 +10,10 @@ router.route('/todos')
   .get(secureRoute, toDos.index)
   .post(secureRoute, toDos.create)
 
+router.route('/todos/:id')
+  .put(secureRoute, toDos.update)
+  .delete(secureRoute, toDos.delete)
+
 router.route('/profile')
   .get(secureRoute, users.userProfile)
 

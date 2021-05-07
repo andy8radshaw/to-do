@@ -1,5 +1,5 @@
 import ToDo from '../models/toDo.js'
-// import { notFound, forbidden } from '../lib/errorHandler.js'
+import { notFound, forbidden } from '../lib/errorHandler.js'
 
 async function toDoIndex(req, res, next) {
   const currentUser = req.currentUser._id
@@ -27,7 +27,36 @@ async function toDoCreate(req, res, next) {
   }
 }
 
+async function toDoUpdate(req, res, next) {
+  const { id } = req.params
+  try {
+    const toDoToUpdate = await ToDo.findById(id)
+    if (!toDoToUpdate) throw new Error(notFound)
+    if (!toDoToUpdate.owner.equals(req.currentUser._id)) throw new Error(forbidden)
+    Object.assign(toDoToUpdate, req.body)
+    await toDoToUpdate.save()
+    return res.status(202).json(toDoToUpdate)
+  } catch (err) {
+    next(err)
+  }
+}
+
+async function toDoDelete(req, res, next) {
+  const { id } = req.params
+  try {
+    const toDoToDelete = await ToDo.findById(id)
+    if (!toDoToDelete) throw new Error(notFound)
+    if (!toDoToDelete.owner.equals(req.currentUser._id)) throw new Error(forbidden)
+    await toDoToDelete.remove()
+    return res.sendStatus(204)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export default {
   index: toDoIndex,
-  create: toDoCreate
+  create: toDoCreate,
+  update: toDoUpdate,
+  delete: toDoDelete
 }
