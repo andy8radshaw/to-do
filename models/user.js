@@ -7,6 +7,12 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true }
 })
 
+userSchema.virtual('createdToDos', {
+  ref: 'ToDo',
+  localField: '_id',
+  foreignField: 'owner'
+})
+
 
 userSchema.set('toJSON', {
   virtuals: true,
